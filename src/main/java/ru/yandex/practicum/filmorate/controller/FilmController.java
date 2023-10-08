@@ -20,10 +20,10 @@ public class FilmController {
     private final Map<Integer, Film> filmStorage = new HashMap<>();
     private int generatedId;
 
-    private final static LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private final LocalDate startReleaseDate = LocalDate.of(1895, 12, 28);
 
     public void validate(Film data) {
-        if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
+        if (data.getReleaseDate().isBefore(startReleaseDate)) {
             throw new ValidationException("Дата релиза некорректна");
         }
         if (data.getName().isBlank()) {
