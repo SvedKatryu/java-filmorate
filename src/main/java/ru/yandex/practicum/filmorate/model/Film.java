@@ -2,20 +2,29 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.validation.release.ReleaseAnnotation;
+import lombok.experimental.SuperBuilder;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import javax.validation.constraints.*;
 @Data
+@SuperBuilder
+@NotNull
 @NoArgsConstructor
 public class Film {
+
     private int id;
+    @NotNull
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
+    @NotNull
     @Size(max = 200, message = "Максимальная длина описания — 200 символов")
     private String description;
-    @ReleaseAnnotation(message = "Дата релиза — не раньше 28 декабря 1895 года")
+    @NotNull
     private LocalDate releaseDate;
+    @NotNull
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
 }
