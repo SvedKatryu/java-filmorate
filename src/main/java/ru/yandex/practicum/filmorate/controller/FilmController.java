@@ -20,7 +20,7 @@ public class FilmController {
     private final Map<Integer, Film> filmStorage = new HashMap<>();
     private int generatedId;
 
-    public final static LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     private void validate(Film data) {
         if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
