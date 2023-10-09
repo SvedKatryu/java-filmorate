@@ -21,7 +21,7 @@ public class UserController {
     private final Map<Integer, User> userStorage = new HashMap<>();
     private int generatedId;
 
-    public void validate(User data) {
+    private void validate(User data) {
         if (data.getEmail().isBlank() || !data.getEmail().contains("@")) {
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }

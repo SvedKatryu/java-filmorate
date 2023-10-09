@@ -46,7 +46,7 @@ public class UserControllerTest {
                 .login("login")
                 .birthday(LocalDate.parse("1986-08-20"))
                 .build();
-        userController.validate(user);
+        userController.create(user);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class UserControllerTest {
                 .login("login")
                 .birthday(LocalDate.parse("1986-08-20"))
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        Exception exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
     }
 
@@ -67,7 +67,7 @@ public class UserControllerTest {
                 .login("login")
                 .birthday(LocalDate.parse("1986-08-20"))
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        Exception exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
     }
 
@@ -78,7 +78,7 @@ public class UserControllerTest {
                 .login("login")
                 .birthday(LocalDate.parse("2024-08-20"))
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        Exception exception = assertThrows(ValidationException.class, () -> userController.create(user));
         assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
     }
 

@@ -47,7 +47,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1900, 1, 1))
                 .duration(100)
                 .build();
-        filmController.validate(film);
+        filmController.create(film);
     }
 
     @Test
@@ -58,7 +58,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1800, 1, 1))
                 .duration(100)
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> filmController.validate(film));
+        Exception exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Дата релиза некорректна", exception.getMessage());
     }
 
@@ -70,7 +70,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1985, 1, 1))
                 .duration(100)
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> filmController.validate(film));
+        Exception exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception.getMessage());
     }
 
@@ -82,7 +82,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1985, 1, 1))
                 .duration(100)
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> filmController.validate(film));
+        Exception exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Максимальная длина описания — 200 символов", exception.getMessage());
     }
 
@@ -94,7 +94,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1985, 1, 1))
                 .duration(-1)
                 .build();
-        Exception exception = assertThrows(ValidationException.class, () -> filmController.validate(film));
+        Exception exception = assertThrows(ValidationException.class, () -> filmController.create(film));
         assertEquals("Продолжительность фильма должна быть положительной", exception.getMessage());
     }
 

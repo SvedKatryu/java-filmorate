@@ -20,10 +20,10 @@ public class FilmController {
     private final Map<Integer, Film> filmStorage = new HashMap<>();
     private int generatedId;
 
-    private final LocalDate startReleaseDate = LocalDate.of(1895, 12, 28);
+    public final static LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
-    public void validate(Film data) {
-        if (data.getReleaseDate().isBefore(startReleaseDate)) {
+    private void validate(Film data) {
+        if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
             throw new ValidationException("Дата релиза некорректна");
         }
         if (data.getName().isBlank()) {
@@ -42,7 +42,7 @@ public class FilmController {
         validate(film);
         if (filmStorage.containsKey(film.getId())) {
             filmStorage.put(film.getId(), film);
-            log.info("Данные пользователя изменены");
+            log.info("Параметры фильма изменены");
         } else {
             throw new ValidationException("Данный фильм не найден");
         }
