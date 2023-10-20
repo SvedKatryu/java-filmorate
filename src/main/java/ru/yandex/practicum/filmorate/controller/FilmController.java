@@ -1,24 +1,23 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
 
-    private final Map<Integer, Film> filmStorage = new HashMap<>();
-    private int generatedId;
+    private final FilmService filmService;
 
     private static final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
@@ -38,29 +37,45 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film) {
-        validate(film);
-        if (filmStorage.containsKey(film.getId())) {
-            filmStorage.put(film.getId(), film);
-            log.info("Параметры фильма изменены");
-        } else {
-            throw new ValidationException("Данный фильм не найден");
-        }
-        return film;
+    public Film update(@Valid @RequestBody Film updatedFilm) {
+        validate(updatedFilm);
+        return filmService.update(updatedFilm);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         validate(film);
-        film.setId(++generatedId);
-        filmStorage.put(film.getId(), film);
-        log.info("Добавили новый фильм");
-        return film;
+        return filmService.create(film);
     }
 
     @GetMapping
     public List<Film> getAll() {
-        log.info("Добавили все фильмы");
-        return new ArrayList<>(filmStorage.values());
+       return filmService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable(value = "id") int filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
+    @PutMapping("{id}/like/{userId}")
+    public ResponseEntity<HttpStatus> addLike(@PathVariable(value = "id") int filmId,
+                                              @PathVariable(value = "userId") int userId) {
+        filmService.addLike(filmId, userId);
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<HttpStatus> removeLike(@PathVariable(value = "id") int filmId,
+                                                 @PathVariable(value = "userId") int userId) {
+        filmService.removeLike(filmId, userId);
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopularFilms(@RequestParam(required = false, defaultValue = "10") int count) {
+        return filmService.getMostPopularFilms(count);
     }
 }
