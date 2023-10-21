@@ -30,11 +30,13 @@ public class Film {
     private int duration;
     private Set<Long> likes;
     private int rate;
-    public void addLike (long userId) {
+
+    public void addLike(long userId) {
         likes.add(userId);
         rate += 1;
     }
-    public void removeLike (long userId) {
+
+    public void removeLike(long userId) {
         likes.remove(userId);
         rate -= 1;
     }
