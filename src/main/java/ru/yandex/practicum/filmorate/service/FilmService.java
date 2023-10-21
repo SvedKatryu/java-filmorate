@@ -38,17 +38,14 @@ public class FilmService {
         userStorage.getUserById(userId);
         Film film = filmStorage.getFilmById(filmId);
 
-        film.getLikes().add(userId);
-        film.setRate(film.getRate() + 1);
-
+        film.addLike(userId);
     }
 
     public void removeLike(long filmId, long userId) {
         userStorage.getUserById(userId);
         Film film = filmStorage.getFilmById(filmId);
 
-        film.getLikes().remove(userId);
-        film.setRate(film.getRate() - 1);
+        film.removeLike(userId);
     }
 
     public List<Film> getMostPopularFilms(long count) {

@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -64,11 +62,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<HttpStatus> addToFriends(@PathVariable(value = "id") int id,
-                                                   @PathVariable(value = "friendId") int friendId) {
+    public void addToFriends(@PathVariable(value = "id") int id,
+                             @PathVariable(value = "friendId") int friendId) {
         userService.addToFriends(id, friendId);
-
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("{id}/friends")
@@ -77,9 +73,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<HttpStatus> removeFromFriends(@PathVariable(value = "id") int id,
-                                                        @PathVariable(value = "friendId") int friendId) {
+    public void removeFromFriends(@PathVariable() int id,
+                                  @PathVariable() int friendId) {
         userService.removeFromFriends(id, friendId);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

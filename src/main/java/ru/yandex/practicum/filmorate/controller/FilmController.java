@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -59,23 +57,19 @@ public class FilmController {
     }
 
     @PutMapping("{id}/like/{userId}")
-    public ResponseEntity<HttpStatus> addLike(@PathVariable(value = "id") int filmId,
-                                              @PathVariable(value = "userId") int userId) {
+    public void addLike(@PathVariable(value = "id") int filmId,
+                        @PathVariable(value = "userId") int userId) {
         filmService.addLike(filmId, userId);
-
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<HttpStatus> removeLike(@PathVariable(value = "id") int filmId,
-                                                 @PathVariable(value = "userId") int userId) {
+    public void removeLike(@PathVariable(value = "id") int filmId,
+                           @PathVariable(value = "userId") int userId) {
         filmService.removeLike(filmId, userId);
-
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilms(@RequestParam(required = false, defaultValue = "10") int count) {
+    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getMostPopularFilms(count);
     }
 }

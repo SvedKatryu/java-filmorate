@@ -35,14 +35,10 @@ public class UserService {
         Set<Long> currentUsers = userStorage.getUserById(id).getFriends();
         Set<Long> otherUsers = userStorage.getUserById(otherId).getFriends();
 
-        Set<Long> commonFriendsId = currentUsers.stream()
+        List<User> commonFriends = currentUsers.stream()
                 .filter(otherUsers::contains)
-                .collect(Collectors.toSet());
-
-        List<User> commonFriends = new ArrayList<>();
-        for (long userId : commonFriendsId) {
-            commonFriends.add(userStorage.getUserById(userId));
-        }
+                .map(userStorage::getUserById)
+                .collect(Collectors.toList());
 
         return commonFriends;
     }
