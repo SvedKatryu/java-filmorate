@@ -6,13 +6,14 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @SuperBuilder
 @NotNull
 @NoArgsConstructor
 public class User {
-    private int id;
+    private Long id;
     @NotBlank(message = "Электронная почта не может быть пустой и должна содержать символ @")
     @Email(message = "Электронная почта не может быть пустой и должна содержать символ @")
     private String email;
@@ -24,4 +25,5 @@ public class User {
     @NotNull
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+    private Set<Long> friends;
 }
