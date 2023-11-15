@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.*;
-
+@Deprecated
 @Component
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
