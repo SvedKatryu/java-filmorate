@@ -8,9 +8,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.*;
-@Deprecated
 @Component
 @Slf4j
+@Deprecated
 public class InMemoryFilmStorage implements FilmStorage {
 
     private long id = 0;
@@ -80,5 +80,14 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильм не найден");
         }
         return films.get(id);
+    }
+
+    @Override
+    public Film delete(Film film) {
+        if (films.containsKey(film.getId())) {
+            films.remove(film.getId(), film);
+            return film;
+        }
+        throw new NotFoundException("Фильма с ID: " + film.getId() + " нет");
     }
 }

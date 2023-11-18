@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -30,6 +31,12 @@ public class Film {
     private int duration;
     private Set<Long> likes;
     private int rate;
+
+    private Mpa mpa;
+    @NotNull
+    private int mpaId;
+
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 
     public void addLike(long userId) {
         likes.add(userId);

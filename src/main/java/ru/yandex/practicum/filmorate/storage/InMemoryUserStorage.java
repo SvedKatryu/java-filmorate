@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -8,9 +11,9 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.*;
-@Deprecated
 @Component
 @Slf4j
+@Deprecated
 public class InMemoryUserStorage implements UserStorage {
     private long id = 0;
 
@@ -71,5 +74,31 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь не найден");
         }
         return users.get(id);
+    }
+
+    @Override
+    public User delete(User user) {
+        if (users.containsKey(user.getId())) {
+            users.remove(user.getId(), user);
+            return user;
+        }
+        throw new NoSuchElementException("Пользователя с ID: " + user.getId() + " нет");
+    }
+
+    @Data
+    @Component
+    @RequiredArgsConstructor
+    public static class LikeStorage {
+        private final JdbcTemplate jdbcTemplate;
+
+        public void addLike(Long filmId, Long userId) {
+            String sqlQuery = "insert into likes (film_id, user_id) values (?, ?)";
+            jdbcTemplate.update(sqlQuery, filmId, userId);
+        }
+
+        public void removeLike(Long filmId, Long userId) {
+            String sqlQuery = "delete from likes where film_id = ? and user_id = ?";
+            jdbcTemplate.update(sqlQuery, filmId, userId);
+        }
     }
 }

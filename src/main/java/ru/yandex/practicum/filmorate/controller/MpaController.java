@@ -24,7 +24,7 @@ public class MpaController {
         log.info("Get all genres {}", mpas);
         return mpas;
     }
-
+    @GetMapping("/{id}")
     public Mpa getMpaById(@PathVariable long id) {
         return service.getMpaById(id);
     }
