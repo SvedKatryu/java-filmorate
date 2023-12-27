@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -28,8 +29,12 @@ public class UserDbStorage implements UserStorage {
         if (users.size() > 1) {
             throw new DataNotFoundException(String.format("user with id %s not single", id));
         }
+        if (users.size() < 1) {
+            throw new NotFoundException(String.format("user with id %s not found", id));
+        }
         return users.get(0);
     }
+
 
     @Override
     public List<User> getAll() {

@@ -37,14 +37,4 @@ public class Film {
     private int mpaId;
 
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
-
-    public void addLike(long userId) {
-        likes.add(userId);
-        rate += 1;
-    }
-
-    public void removeLike(long userId) {
-        likes.remove(userId);
-        rate -= 1;
-    }
 }

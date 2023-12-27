@@ -7,20 +7,23 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.FriendDbStorage;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
 public class UserService {
     private final UserStorage userStorage;
-    private final FriendStorage friendStorage;
+    private final FriendDbStorage friendStorage;
 
-    public UserService(@Qualifier("userDbStorage") UserStorage storage, FriendStorage friendStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage storage,  FriendDbStorage friendStorage) {
         this.userStorage = storage;
         this.friendStorage = friendStorage;
     }
+
     public List<User> getAll() {
         return userStorage.getAll();
     }
@@ -47,14 +50,22 @@ public class UserService {
         User user = userStorage.getUserById(id);
         User friend = userStorage.getUserById(friendId);
         if (Objects.equals(user.getId(), friend.getId())) {
-            if (user.getFriends().contains(friend.getId())) {
-                throw new NotFoundException("Друг с ID:" + friend.getId() + " уже добавлен");
-            }
             throw new NotFoundException("Нельзя добавить себя в друзья");
         }
+        if (user.getFriends().contains(friend.getId())) {
+            throw new NotFoundException("Друг с ID:" + friend.getId() + " уже добавлен");
+        }
         log.info("Добавлен в друзья: {}", friend);
-        user.getFriends().add(friend.getId());
-        friendStorage.addFriend(user.getId(), friend.getId());
+
+        Set<Long> friends = user.getFriends();
+        friends.add(friend.getId());
+        user.setFriends(friends);
+//        user.getFriends().add(friend.getId());
+        try {
+            friendStorage.addFriend(user.getId(), friend.getId());
+        } catch (NotFoundException e) {
+            throw new NotFoundException("Друг с ID:" + friend.getId() + " не добавлен");
+        }
     }
 
     public List<User> getFriends(Long userId) {

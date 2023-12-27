@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -9,6 +11,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,8 +36,22 @@ public class UserController {
     @PutMapping
     public User update(@Valid @RequestBody User updatedUser) {
         validate(updatedUser);
-        return userService.update(updatedUser);
+        userService.update(updatedUser);
+        return updatedUser;
     }
+
+//    @PutMapping
+//    @ResponseStatus
+//    public User update(@Valid @RequestBody User updatedUser) {
+//        validate(updatedUser);
+//        Optional<User> user = Optional.ofNullable(userService.getUserById(updatedUser.getId()));
+//        if(user.isPresent()) {
+//            userService.update(updatedUser);
+//        } else {
+//            throw new NotFoundException("Такого пользователя не существует");
+//        }
+//        return updatedUser;
+//    }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {

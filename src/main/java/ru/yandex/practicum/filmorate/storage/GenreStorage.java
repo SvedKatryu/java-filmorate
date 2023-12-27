@@ -11,6 +11,7 @@ public interface GenreStorage {
     List<Genre> getAll();
 
     Genre getGenreById(long id);
+
     List<Genre> getGenreFilms(Long filmId);
 
     void deleteGenreFilmsByFilmId(Long filmId);

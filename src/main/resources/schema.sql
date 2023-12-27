@@ -1,3 +1,4 @@
+drop table if exists "users", "mpa", "films", "film_genres", "genres", "friendships";
 create table if not exists mpa (
     mpa_id      int AUTO_INCREMENT primary key,
     name        varchar(255)  NOT NULL,
