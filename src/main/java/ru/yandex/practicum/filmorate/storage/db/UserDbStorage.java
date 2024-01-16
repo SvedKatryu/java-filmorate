@@ -1,26 +1,42 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 
 @Component
-@RequiredArgsConstructor
+@AllArgsConstructor
+@Qualifier("userDbStorage")
+@Slf4j
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
+    private void validate(User data) {
+        if (data.getEmail().isBlank() || !data.getEmail().contains("@")) {
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
+        }
+        if (data.getLogin().isBlank()) {
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+        }
+        if (LocalDate.now().isBefore(data.getBirthday())) {
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
+    }
 
     @Override
     public User getUserById(long id) {
@@ -34,7 +50,6 @@ public class UserDbStorage implements UserStorage {
         }
         return users.get(0);
     }
-
 
     @Override
     public List<User> getAll() {
@@ -52,19 +67,48 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
+        validate(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
-        if (Objects.equals(user.getName(), "")) {
+        if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         Long id = simpleJdbcInsert.executeAndReturnKey(newMap(user)).longValue();
         user.setId(id);
+//        Set<Long> friends = Collections.emptySet();
+//        user.setFriends(friends);
+        log.info("Добавили нового пользователя: {}", user);
         return user;
     }
 
+//    @Override
+//    public User create(User user) {
+//        validate(user);
+//        //user.setId(getNextId());
+//        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+//                .withTableName("users")
+//                .usingGeneratedKeyColumns("user_id");
+//        if (user.getName().isEmpty()) {
+//            user.setName(user.getLogin());
+//        }
+//        Long id = simpleJdbcInsert.executeAndReturnKey(newMap(user)).longValue();
+//
+//        Set<Long> friends = Collections.emptySet();
+//        user.setFriends(friends);
+//        if (user.getName() == null || user.getName().isBlank()) {
+//            user.setName(user.getLogin());
+//        }
+//        user.setId(id);
+//        log.info("Добавили нового пользователя", user);
+//        return user;
+//    }
+
+
+
     @Override
     public User update(User user) {
+        validate(user);
         User checkUser = getUserById(user.getId());
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
         jdbcTemplate.update(

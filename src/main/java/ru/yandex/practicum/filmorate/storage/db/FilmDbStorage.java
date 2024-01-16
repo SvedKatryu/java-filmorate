@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -13,7 +14,9 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +27,27 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
 
+    private static final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+
+    private void validate(Film data) {
+        if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
+            throw new ValidationException("Дата релиза некорректна");
+        }
+        if (data.getName().isBlank()) {
+            throw new ValidationException("Название фильма не может быть пустым");
+        }
+        if (data.getDescription().length() > 200) {
+            throw new ValidationException("Максимальная длина описания — 200 символов");
+        }
+        if (data.getDuration() <= 0) {
+            throw new ValidationException("Продолжительность фильма должна быть положительной");
+        }
+    }
+
     @Override
     public Film getFilmById(long id) {
         String sqlQuery = "select * from mpa where id = ?";
-        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::RowMapperFilm, id);
+        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::queryRowMapperFilm, id);
         if (films.size() != 1) {
             throw new DataNotFoundException(String.format("mpa with id %s not single", id));
         }
@@ -37,11 +57,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         String sqlQuery = "select * from users";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::RowMapperFilm);
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::queryRowMapperFilm);
     }
 
     @Override
     public Film create(Film film) {
+        validate(film);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
@@ -61,6 +82,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
+        validate(film);
         Film checkFilm = getFilmById(film.getId());
         String sqlQuery = "update films set " +
                 "name = ?, description = ?, release_date = ? , duration = ? , mpa_id = ? where film_id = ?";
@@ -119,14 +141,14 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    static Film RowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
+    static Film queryRowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
-                .releaseDate(rs.getDate("releaseDate").toLocalDate())
+                .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                .mpaId(rs.getInt("mpaId"))
+                .mpaId(rs.getInt("mpa_id"))
                 .build();
     }
 }

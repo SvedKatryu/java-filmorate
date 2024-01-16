@@ -1,4 +1,13 @@
-drop table if exists "users", "mpa", "films", "film_genres", "genres", "friendships";
+drop table if exists users, mpa, films, film_genres, genres, friendships, likes;
+-- DROP TABLE if exists users cascade;
+-- DROP TABLE if exists mpa cascade;
+-- DROP TABLE if exists films cascade;
+-- DROP TABLE if exists film_genres cascade;
+-- DROP TABLE if exists genres cascade;
+-- DROP TABLE if exists friendships cascade;
+-- DROP TABLE if exists likes cascade;
+
+
 create table if not exists mpa (
     mpa_id      int AUTO_INCREMENT primary key,
     name        varchar(255)  NOT NULL,
@@ -30,7 +39,9 @@ create table if not exists users (
     email    varchar(255) NOT NULL,
     login    varchar(255) NOT NULL,
     name     varchar(255),
-    birthday date NOT NULL
+    birthday date NOT NULL,
+    UNIQUE(email),
+    UNIQUE(login)
 );
 
 create table if not exists likes (
@@ -45,10 +56,10 @@ create table if not exists friendships (
     PRIMARY KEY (user_id, friends_id)
 );
 
-delete from film_genres;
-delete from friendships;
-delete from FILMS;
-delete from likes;
-delete from users;
-alter table users alter COLUMN user_id RESTART with 1;
-alter table films alter COLUMN film_id RESTART with 1;
+-- delete from film_genres;
+-- delete from friendships;
+-- delete from FILMS;
+-- delete from likes;
+-- delete from users;
+-- alter table users alter COLUMN user_id RESTART with 1;
+-- alter table films alter COLUMN film_id RESTART with 1;

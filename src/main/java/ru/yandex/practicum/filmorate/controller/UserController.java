@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,21 +22,21 @@ public class UserController {
 
     private final UserService userService;
 
-    private void validate(User data) {
-        if (data.getEmail().isBlank() || !data.getEmail().contains("@")) {
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (data.getLogin().isBlank()) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (LocalDate.now().isBefore(data.getBirthday())) {
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-    }
+//    private void validate(User data) {
+//        if (data.getEmail().isBlank() || !data.getEmail().contains("@")) {
+//            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
+//        }
+//        if (data.getLogin().isBlank()) {
+//            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+//        }
+//        if (LocalDate.now().isBefore(data.getBirthday())) {
+//            throw new ValidationException("Дата рождения не может быть в будущем");
+//        }
+//    }
 
     @PutMapping
     public User update(@Valid @RequestBody User updatedUser) {
-        validate(updatedUser);
+        //validate(updatedUser);
         userService.update(updatedUser);
         return updatedUser;
     }
@@ -55,7 +56,7 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        validate(user);
+        //validate(user);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -73,25 +74,25 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(@PathVariable(value = "id") Long id,
-                                       @PathVariable(value = "otherId") Long otherId) {
+    public List<User> getCommonFriends(@PathVariable(value = "id") long id,
+                                       @PathVariable(value = "otherId") long otherId) {
         return userService.getCommonFriends(id, otherId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addToFriends(@PathVariable(value = "id") Long id,
-                             @PathVariable(value = "friendId") Long friendId) {
+    public void addToFriends(@PathVariable(value = "id") long id,
+                                  @PathVariable(value = "friendId") long friendId) {
         userService.addToFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable(value = "id") Long id) {
+    public List<User> getFriends(@PathVariable long id) {
         return userService.getFriends(id);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFromFriends(@PathVariable(value = "id") Long id,
-                                  @PathVariable(value = "friendId") Long friendId) {
+    public void removeFromFriends(@PathVariable(value = "id") long id,
+                                  @PathVariable(value = "friendId") long friendId) {
         userService.removeFromFriends(id, friendId);
     }
 }

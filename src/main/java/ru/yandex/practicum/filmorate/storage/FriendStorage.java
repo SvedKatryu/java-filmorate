@@ -8,10 +8,12 @@ import java.util.List;
 @Component
 public interface FriendStorage {
 
-    void addFriend(Long userId, Long friendId);
-    void deleteFriend(Long userId, Long friendId);
+    void addFriend(long userId, long friendId);
 
-    List<User> getFriends(Long userId);
-    List<User> getCommonFriends(Long userId, Long friendId);
+    void deleteFriend(long userId, long friendId);
+
+    List<User> getFriends(long userId);
+
+    List<User> getCommonFriends(long userId, long friendId);
 }
 

@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -19,11 +20,11 @@ public class User {
     private String email;
     @NotNull
     @NotEmpty(message = "Логин не может быть пустым и содержать пробелы")
-    @Pattern(regexp = "\\S+",  message = "Логин не может быть пустым и содержать пробелы")
+    @Pattern(regexp = "\\S+", message = "Логин не может быть пустым и содержать пробелы")
     private String login;
     private String name;
     @NotNull
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
-    private Set<Long> friends;
+    private Set<Long> friends = new HashSet<>();;
 }

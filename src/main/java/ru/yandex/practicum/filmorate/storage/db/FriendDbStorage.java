@@ -15,17 +15,17 @@ import java.util.List;
 public class FriendDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public void addFriend(Long userId, Long friendId) {
+    public void addFriend(long userId, long friendId) {
         String sqlQuery = "insert into friendships (user_id, friends_id) values (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, friendId);
     }
 
-    public void deleteFriend(Long userId, Long friendId) {
+    public void deleteFriend(long userId, long friendId) {
         String sqlQuery = "delete from friendships where user_id = ? and friends_id = ?";
         jdbcTemplate.update(sqlQuery, userId, friendId);
     }
 
-    public List<User> getFriends(Long userId) {
+    public List<User> getFriends(long userId) {
         String sqlQuery = "select u.* " +
                 "from USERS u, FRIENDSHIPS f " +
                 "where u.USER_ID = f.FRIENDS_ID " +
@@ -33,7 +33,7 @@ public class FriendDbStorage implements FriendStorage {
         return jdbcTemplate.query(sqlQuery, FriendDbStorage::mapRowFriends, userId);
     }
 
-    public List<User> getCommonFriends(Long userId, Long friendId) {
+    public List<User> getCommonFriends(long userId, long friendId) {
         String sqlQuery = "select u.* from USERS u, FRIENDSHIPS f, FRIENDSHIPS o " +
                 "where u.USER_ID = f.FRIENDS_ID " +
                 "AND u.USER_ID = o.FRIENDS_ID " +
