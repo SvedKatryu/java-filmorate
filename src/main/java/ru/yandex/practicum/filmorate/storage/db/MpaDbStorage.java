@@ -19,7 +19,7 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa getMpaById(long id) {
-        String sqlQuery = "select * from mpa where id = ?";
+        String sqlQuery = "select * from mpa where mpa_id = ?";
         List<Mpa> mpas = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, id);
         if (mpas.size() != 1) {
             throw new DataNotFoundException(String.format("mpa with id %s not single", id));
@@ -29,7 +29,7 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public List<Mpa> getAll() {
-        String sqlQuery = "select * from genres";
+        String sqlQuery = "select * from mpa";
         return jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa);
 
     }
@@ -38,6 +38,7 @@ public class MpaDbStorage implements MpaStorage {
         return Mpa.builder()
                 .id(rs.getLong("mpa_id"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description"))
                 .build();
     }
 }

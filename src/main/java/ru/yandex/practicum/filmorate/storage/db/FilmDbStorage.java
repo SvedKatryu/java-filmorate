@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -46,17 +47,20 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(long id) {
-        String sqlQuery = "select * from mpa where id = ?";
+        String sqlQuery = "select * from films where film_id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::queryRowMapperFilm, id);
-        if (films.size() != 1) {
-            throw new DataNotFoundException(String.format("mpa with id %s not single", id));
+        if (films.size() > 1) {
+            throw new DataNotFoundException(String.format("film with id %s not single", id));
+        }
+        if (films.isEmpty()) {
+            throw new NotFoundException(String.format("film with id %s not found", id));
         }
         return films.get(0);
     }
 
     @Override
     public List<Film> getAll() {
-        String sqlQuery = "select * from film";
+        String sqlQuery = "select * from films";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::queryRowMapperFilm);
     }
 
@@ -105,6 +109,12 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    private void addGenreToFilm(Film film) {
+        for (Genre genre : film.getGenres()) {
+            genre.setName(genreStorage.getGenreById(genre.getId()).getName());
+        }
+    }
+
     private Map<String, Object> newMap(Film film) {
         Map<String, Object> values = new HashMap<>();
         values.put("name", film.getName());
@@ -115,11 +125,7 @@ public class FilmDbStorage implements FilmStorage {
         return values;
     }
 
-    private void addGenreToFilm(Film film) {
-        for (Genre genre : film.getGenres()) {
-            genre.setName(genreStorage.getGenreById(genre.getId()).getName());
-        }
-    }
+
 
     private Mpa mpaFromTable(Long id) {
         String sqlQuery = "select * from mpa where mpa_id = ?";
@@ -128,7 +134,7 @@ public class FilmDbStorage implements FilmStorage {
 
     static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
-                .id(rs.getLong("id"))
+                .id(rs.getLong("mpa_id"))
                 .name(rs.getString("name"))
                 .build();
     }

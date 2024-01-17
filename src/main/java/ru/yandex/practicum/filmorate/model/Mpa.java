@@ -15,4 +15,5 @@ public class Mpa {
     private long id;
     @NotBlank
     private String name;
+    private String description;
 }

@@ -23,11 +23,11 @@ create table if not exists films (
     mpa_id       int REFERENCES mpa (mpa_id) ON delete RESTRICT
 );
 
-create table if not exists film_genres (
-    film_id  int NOT NULL,
-    genre_id int NOT NULL,
-    PRIMARY KEY (film_id, genre_id)
-);
+-- create table if not exists film_genres (
+--     film_id  int NOT NULL references users (user_id),
+--     genre_id int NOT NULL references genres (genre_id),
+--     PRIMARY KEY (film_id, genre_id)
+-- );
 
 create table if not exists genres (
     genre_id int AUTO_INCREMENT primary key,
@@ -42,6 +42,12 @@ create table if not exists users (
     birthday date NOT NULL,
     UNIQUE(email),
     UNIQUE(login)
+);
+
+create table if not exists film_genres (
+    film_id  int NOT NULL references films (film_id),
+    genre_id int NOT NULL references genres (genre_id),
+    PRIMARY KEY (film_id, genre_id)
 );
 
 create table if not exists likes (
