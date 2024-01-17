@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +15,10 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -45,7 +47,7 @@ public class UserDbStorage implements UserStorage {
         if (users.size() > 1) {
             throw new DataNotFoundException(String.format("user with id %s not single", id));
         }
-        if (users.size() < 1) {
+        if (users.isEmpty()) {
             throw new NotFoundException(String.format("user with id %s not found", id));
         }
         return users.get(0);
@@ -76,35 +78,9 @@ public class UserDbStorage implements UserStorage {
         }
         Long id = simpleJdbcInsert.executeAndReturnKey(newMap(user)).longValue();
         user.setId(id);
-//        Set<Long> friends = Collections.emptySet();
-//        user.setFriends(friends);
         log.info("Добавили нового пользователя: {}", user);
         return user;
     }
-
-//    @Override
-//    public User create(User user) {
-//        validate(user);
-//        //user.setId(getNextId());
-//        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-//                .withTableName("users")
-//                .usingGeneratedKeyColumns("user_id");
-//        if (user.getName().isEmpty()) {
-//            user.setName(user.getLogin());
-//        }
-//        Long id = simpleJdbcInsert.executeAndReturnKey(newMap(user)).longValue();
-//
-//        Set<Long> friends = Collections.emptySet();
-//        user.setFriends(friends);
-//        if (user.getName() == null || user.getName().isBlank()) {
-//            user.setName(user.getLogin());
-//        }
-//        user.setId(id);
-//        log.info("Добавили нового пользователя", user);
-//        return user;
-//    }
-
-
 
     @Override
     public User update(User user) {

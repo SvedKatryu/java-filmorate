@@ -56,7 +56,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        String sqlQuery = "select * from users";
+        String sqlQuery = "select * from film";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::queryRowMapperFilm);
     }
 

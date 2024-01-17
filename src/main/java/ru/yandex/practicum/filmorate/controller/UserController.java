@@ -2,17 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,9 +51,6 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         //validate(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
         return userService.create(user);
     }
 
@@ -73,6 +64,7 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable(value = "id") long id,
                                        @PathVariable(value = "otherId") long otherId) {
@@ -81,13 +73,18 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addToFriends(@PathVariable(value = "id") long id,
-                                  @PathVariable(value = "friendId") long friendId) {
+                             @PathVariable(value = "friendId") long friendId) {
         userService.addToFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable long id) {
         return userService.getFriends(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public User removeFromUsers(@PathVariable Long id) {
+        return userService.removeUser(id);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
