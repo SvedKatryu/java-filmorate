@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
@@ -21,8 +22,11 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa getMpaById(long id) {
         String sqlQuery = "select * from mpa where mpa_id = ?";
         List<Mpa> mpas = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, id);
-        if (mpas.size() != 1) {
+        if (mpas.size() > 1) {
             throw new DataNotFoundException(String.format("mpa with id %s not single", id));
+        }
+        if (mpas.isEmpty()) {
+            throw new NotFoundException(String.format("film with id %s not found", id));
         }
         return mpas.get(0);
     }

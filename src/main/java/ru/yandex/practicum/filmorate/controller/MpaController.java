@@ -17,15 +17,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MpaController {
 
-    private final MpaService service;
+    private final MpaService mpaService;
+
     @GetMapping
     public List<Mpa> getAll() {
-        final List<Mpa> mpas = service.getAll();
+        final List<Mpa> mpas = mpaService.getAll();
         log.info("Get all genres {}", mpas);
         return mpas;
     }
+
     @GetMapping("/{id}")
     public Mpa getMpaById(@PathVariable long id) {
-        return service.getMpaById(id);
+        return mpaService.getMpaById(id);
     }
 }

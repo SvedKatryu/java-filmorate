@@ -58,7 +58,7 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
         log.info("Поставлен лайк фильму: {}", filmStorage.getFilmById(film.getId()));
-        filmStorage.getFilmById(film.getId()).getLikes().add(user.getId());
+//        film.getLikes().add(user.getId());
         likeStorage.addLike(film.getId(), user.getId());
     }
 
@@ -67,7 +67,7 @@ public class FilmService {
         User user = userStorage.getUserById(userId);
         if (film.getLikes().contains(user.getId())) {
             log.info("Удалён лайк фильму: {}", film);
-            film.getLikes().remove(user.getId());
+//            film.getLikes().remove(user.getId());
             likeStorage.deleteLike(film.getId(), user.getId());
         }
     }

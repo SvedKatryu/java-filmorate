@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
@@ -20,10 +21,13 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Genre getGenreById(long id) {
-        String sqlQuery = "select * from genres where id = ?";
+        String sqlQuery = "select * from genres where genre_id = ?";
         List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, id);
-        if (genres.size() != 1) {
+        if (genres.size() > 1) {
             throw new DataNotFoundException(String.format("genre with id %s not single", id));
+        }
+        if (genres.isEmpty()) {
+            throw new NotFoundException(String.format("film with id %s not found", id));
         }
         return genres.get(0);
     }
@@ -40,7 +44,7 @@ public class GenreDbStorage implements GenreStorage {
         jdbcTemplate.batchUpdate(
                 sqlQuery,
                 genres,
-                10,
+                20,
                 (PreparedStatement ps, Genre g) -> {
                     ps.setLong(1, filmId);
                     ps.setLong(2, g.getId());
