@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class GenreDbStorage implements GenreStorage {
 
     }
 
-    public void addGenreToFilm(Long filmId, Set<Genre> genres) {
+    public void addGenreToFilm(Long filmId, List<Genre> genres) {
         String sqlQuery = "insert into film_genres (film_id, genre_id) values (?, ?);";
         jdbcTemplate.batchUpdate(
                 sqlQuery,

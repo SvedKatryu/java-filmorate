@@ -43,7 +43,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) {
         String sqlQuery = "select * from users where user_id = ?";
-        List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::RowMapperUser, id);
+        List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::rowMapperUser, id);
         if (users.size() > 1) {
             throw new DataNotFoundException(String.format("user with id %s not single", id));
         }
@@ -56,7 +56,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         String sqlQuery = "select * from users";
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::RowMapperUser);
+        return jdbcTemplate.query(sqlQuery, UserDbStorage::rowMapperUser);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class UserDbStorage implements UserStorage {
         return values;
     }
 
-    static User RowMapperUser(ResultSet rs, int rowNum) throws SQLException {
+    static User rowMapperUser(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
                 .id(rs.getLong("user_id"))
                 .email(rs.getString("email"))
