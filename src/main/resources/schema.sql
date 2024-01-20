@@ -1,12 +1,4 @@
 drop table if exists users, mpa, films, film_genres, genres, friendships, likes;
--- DROP TABLE if exists users cascade;
--- DROP TABLE if exists mpa cascade;
--- DROP TABLE if exists films cascade;
--- DROP TABLE if exists film_genres cascade;
--- DROP TABLE if exists genres cascade;
--- DROP TABLE if exists friendships cascade;
--- DROP TABLE if exists likes cascade;
-
 
 create table if not exists mpa (
     mpa_id      int AUTO_INCREMENT primary key,
@@ -22,12 +14,6 @@ create table if not exists films (
     duration     int NOT NULL,
     mpa_id       int REFERENCES mpa (mpa_id) ON delete RESTRICT
 );
-
--- create table if not exists film_genres (
---     film_id  int NOT NULL references users (user_id),
---     genre_id int NOT NULL references genres (genre_id),
---     PRIMARY KEY (film_id, genre_id)
--- );
 
 create table if not exists genres (
     genre_id int AUTO_INCREMENT primary key,
@@ -61,11 +47,3 @@ create table if not exists friendships (
     friends_id int NOT NULL,
     PRIMARY KEY (user_id, friends_id)
 );
-
--- delete from film_genres;
--- delete from friendships;
--- delete from FILMS;
--- delete from likes;
--- delete from users;
--- alter table users alter COLUMN user_id RESTART with 1;
--- alter table films alter COLUMN film_id RESTART with 1;

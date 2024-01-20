@@ -21,7 +21,6 @@ import java.util.*;
 
 @Component
 @AllArgsConstructor
-//@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -69,10 +68,8 @@ public class FilmDbStorage implements FilmStorage {
             film.setLikes(likes);
             film.setRate(likes.size());
         }
-
         genres = genreStorage.getGenreFilms(id);
         film.setGenres(genres);
-
         return film;
     }
 
@@ -89,7 +86,6 @@ public class FilmDbStorage implements FilmStorage {
         addGenreToFilm(film);
 
         genreStorage.addGenreToFilm(film.getId(), film.getGenres());
-
 
         if (film.getMpa().getId() != 0) {
             film.setMpa(mpaFromTable(film.getMpa().getId()));
@@ -114,15 +110,16 @@ public class FilmDbStorage implements FilmStorage {
         );
 
         genreStorage.deleteGenreFilmsByFilmId(film.getId());
-
         addGenreToFilm(film);
-
         genreStorage.addGenreToFilm(film.getId(), film.getGenres());
-
         return film;
     }
 
     private void addGenreToFilm(Film film) {
+        List<Genre> genres = film.getGenres();
+        Set<Genre> genresSet = new LinkedHashSet<>(genres);
+        List<Genre> genresArr = new ArrayList<Genre>(genresSet);
+        film.setGenres(genresArr);
         for (Genre genre : film.getGenres()) {
             genre.setName(genreStorage.getGenreById(genre.getId()).getName());
         }
@@ -172,9 +169,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.NAME as mpa_name FROM FILMS f JOIN MPA m on f.mpa_id  = m.mpa_id";
-
         List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::rowNewMapperFilm);
-        List<Integer> filmIds = new ArrayList<>();
         List<Genre> genres = new ArrayList<>();
         for (Film film : films) {
             String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
@@ -189,16 +184,13 @@ public class FilmDbStorage implements FilmStorage {
                 film.setLikes(likes);
                 film.setRate(likes.size());
             }
-            for (long id : filmIds) {
-                genres = genreStorage.getGenreFilms(id);
-            }
+            genres = genreStorage.getGenreFilms(film.getId());
             film.setGenres(genres);
         }
         return films;
     }
 
     static Film rowNewMapperFilm(ResultSet rs, int rowNum) throws SQLException {
-
         Film film = new Film();
         film.setId(rs.getLong("film_id"));
         film.setName(rs.getString("name"));
@@ -212,5 +204,4 @@ public class FilmDbStorage implements FilmStorage {
         film.setMpa(mpa);
         return film;
     }
-
 }

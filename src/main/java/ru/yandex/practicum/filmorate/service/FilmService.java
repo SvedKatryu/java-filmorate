@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,16 +27,6 @@ public class FilmService {
         this.userStorage = userStorage;
         this.likeStorage = likeStorage;
     }
-
-//    public FilmService(LikeStorage likeStorage) {
-//        this.likeStorage = likeStorage;
-//    }
-
-//    public FilmService(FilmStorage filmStorage,
-//                       UserStorage userStorage) {
-//        this.filmStorage = filmStorage;
-//        this.userStorage = userStorage;
-//    }
 
     public List<Film> getAll() {
         return filmStorage.getAll();
@@ -58,7 +48,6 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
         log.info("Поставлен лайк фильму: {}", filmStorage.getFilmById(film.getId()));
-//        film.getLikes().add(user.getId());
         likeStorage.addLike(film.getId(), user.getId());
     }
 
@@ -67,7 +56,6 @@ public class FilmService {
         User user = userStorage.getUserById(userId);
         if (film.getLikes().contains(user.getId())) {
             log.info("Удалён лайк фильму: {}", film);
-//            film.getLikes().remove(user.getId());
             likeStorage.deleteLike(film.getId(), user.getId());
         }
     }

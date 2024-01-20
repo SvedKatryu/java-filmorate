@@ -16,37 +16,12 @@ public class UserController {
 
     private final UserService userService;
 
-//    private void validate(User data) {
-//        if (data.getEmail().isBlank() || !data.getEmail().contains("@")) {
-//            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-//        }
-//        if (data.getLogin().isBlank()) {
-//            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-//        }
-//        if (LocalDate.now().isBefore(data.getBirthday())) {
-//            throw new ValidationException("Дата рождения не может быть в будущем");
-//        }
-//    }
-
     @PutMapping
     public User update(@Valid @RequestBody User updatedUser) {
         //validate(updatedUser);
         userService.update(updatedUser);
         return updatedUser;
     }
-
-//    @PutMapping
-//    @ResponseStatus
-//    public User update(@Valid @RequestBody User updatedUser) {
-//        validate(updatedUser);
-//        Optional<User> user = Optional.ofNullable(userService.getUserById(updatedUser.getId()));
-//        if(user.isPresent()) {
-//            userService.update(updatedUser);
-//        } else {
-//            throw new NotFoundException("Такого пользователя не существует");
-//        }
-//        return updatedUser;
-//    }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {

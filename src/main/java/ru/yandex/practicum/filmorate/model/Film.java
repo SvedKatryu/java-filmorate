@@ -10,7 +10,6 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,12 +32,8 @@ public class Film {
     private int duration;
     private Set<Long> likes;
     private int rate;
-
     private Mpa mpa;
     @NotNull
     private int mpaId;
-    //private String mpaName;
-    //private List<String> genre = new ArrayList<>();
-//    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     private List<Genre> genres = new ArrayList<>();
 }
