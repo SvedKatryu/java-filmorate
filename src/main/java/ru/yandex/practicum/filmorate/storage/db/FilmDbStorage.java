@@ -162,7 +162,6 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                .mpaId(rs.getInt("mpa_id"))
                 .build();
     }
 

@@ -32,8 +32,7 @@ public class Film {
     private int duration;
     private Set<Long> likes;
     private int rate;
-    private Mpa mpa;
     @NotNull
-    private int mpaId;
+    private Mpa mpa;
     private List<Genre> genres = new ArrayList<>();
 }

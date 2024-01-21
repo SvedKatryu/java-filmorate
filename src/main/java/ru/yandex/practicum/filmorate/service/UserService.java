@@ -52,9 +52,6 @@ public class UserService {
         if (Objects.equals(user.getId(), friend.getId())) {
             throw new NotFoundException("Нельзя добавить себя в друзья");
         }
-        if (friendStorage.getFriends(user.getId()).contains(friend)) {
-            throw new NotFoundException("Друг с ID:" + friend.getId() + " уже добавлен");
-        }
         try {
             friendStorage.addFriend(user.getId(), friend.getId());
         } catch (NotFoundException e) {
