@@ -12,6 +12,7 @@ create table if not exists films (
     description  varchar(255),
     release_date date  NOT NULL,
     duration     int NOT NULL,
+    rate         int,
     mpa_id       int REFERENCES mpa (mpa_id) ON delete RESTRICT
 );
 

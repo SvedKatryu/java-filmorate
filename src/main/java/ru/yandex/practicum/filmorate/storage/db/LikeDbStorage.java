@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.LikeStorage;
 public class LikeDbStorage implements LikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FilmDbStorage filmDbStorage;
 
     public void addLike(Long filmId, Long userId) {
         String sqlQuery = "insert into likes (film_id, user_id) values (?, ?)";

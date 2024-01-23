@@ -59,15 +59,15 @@ public class FilmDbStorage implements FilmStorage {
         String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
         SqlRowSet set = jdbcTemplate.queryForRowSet(userSql, film.getId());
 
-        while (set.next()) {
-            Set<Long> likes = new HashSet<>();
-            if (film.getLikes() != null) {
-                likes = film.getLikes();
-            }
-            likes.add(set.getLong("user_id"));
-            film.setLikes(likes);
-            film.setRate(likes.size());
-        }
+//        while (set.next()) {
+//            Set<Long> likes = new HashSet<>();
+//            if (film.getLikes() != null) {
+//                likes = film.getLikes();
+//            }
+//            likes.add(set.getLong("user_id"));
+//            film.setLikes(likes);
+//            film.setRate(likes.size());
+//        }
         genres = genreStorage.getGenreFilms(id);
         film.setGenres(genres);
         return film;
@@ -82,7 +82,7 @@ public class FilmDbStorage implements FilmStorage {
         Map<String, Object> films = newMap(film);
         Long id = simpleJdbcInsert.executeAndReturnKey(films).longValue();
         film.setId(id);
-
+//        film.setRate(0);
         addGenreToFilm(film);
 
         genreStorage.addGenreToFilm(film.getId(), film.getGenres());
@@ -97,14 +97,27 @@ public class FilmDbStorage implements FilmStorage {
     public Film update(Film film) {
         validate(film);
         Film checkFilm = getFilmById(film.getId());
+//        String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
+//        SqlRowSet set = jdbcTemplate.queryForRowSet(userSql, film.getId());
+//        while (set.next()) {
+//            Set<Long> likes = new HashSet<>();
+//            if (film.getLikes() != null) {
+//                likes = film.getLikes();
+//            }
+//            likes.add(set.getLong("user_id"));
+//            film.setLikes(likes);
+//            film.setRate(likes.size());
+//        }
+
         String sqlQuery = "update films set " +
-                "name = ?, description = ?, release_date = ? , duration = ? , mpa_id = ? where film_id = ?";
+                "name = ?, description = ?, release_date = ? , duration = ? , rate = ? , mpa_id = ? where film_id = ?";
         jdbcTemplate.update(
                 sqlQuery,
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
+                film.getRate(),
                 film.getMpa().getId(),
                 film.getId()
         );
@@ -155,15 +168,15 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    static Film queryRowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("film_id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .build();
-    }
+//    static Film queryRowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
+//        return Film.builder()
+//                .id(rs.getLong("film_id"))
+//                .name(rs.getString("name"))
+//                .description(rs.getString("description"))
+//                .releaseDate(rs.getDate("release_date").toLocalDate())
+//                .duration(rs.getInt("duration"))
+//                .build();
+//    }
 
     @Override
     public List<Film> getAll() {
@@ -174,15 +187,15 @@ public class FilmDbStorage implements FilmStorage {
             String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
             SqlRowSet set = jdbcTemplate.queryForRowSet(userSql, film.getId());
 
-            while (set.next()) {
-                Set<Long> likes = new HashSet<>();
-                if (film.getLikes() != null) {
-                    likes = film.getLikes();
-                }
-                likes.add(set.getLong("user_id"));
-                film.setLikes(likes);
-                film.setRate(likes.size());
-            }
+//            while (set.next()) {
+//                Set<Long> likes = new HashSet<>();
+//                if (film.getLikes() != null) {
+//                    likes = film.getLikes();
+//                }
+//                likes.add(set.getLong("user_id"));
+//                film.setLikes(likes);
+//                film.setRate(likes.size());
+//            }
             genres = genreStorage.getGenreFilms(film.getId());
             film.setGenres(genres);
         }
@@ -196,6 +209,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setDescription(rs.getString("description"));
         film.setReleaseDate(rs.getDate("release_date").toLocalDate());
         film.setDuration(rs.getInt("duration"));
+        film.setRate(rs.getInt("rate"));
 
         Mpa mpa = new Mpa();
         mpa.setId(rs.getInt("mpa_id"));
