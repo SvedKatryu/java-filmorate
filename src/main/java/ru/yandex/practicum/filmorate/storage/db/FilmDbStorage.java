@@ -46,7 +46,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getFilmById(long id) {
         String sqlQuery = "SELECT f.*, m.NAME as mpa_name FROM FILMS f JOIN MPA M on f.mpa_id  = M.mpa_id  WHERE f.film_id =?";
-        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::rowNewMapperFilm, id);
+        List<Film> films = jdbcTemplate.query(sqlQuery, this::rowMapperFilm, id);
         if (films.size() > 1) {
             throw new DataNotFoundException(String.format("film with id %s not single", id));
         }
@@ -55,21 +55,6 @@ public class FilmDbStorage implements FilmStorage {
         }
         Film film = films.get(0);
 
-        List<Genre> genres = new ArrayList<>();
-        String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
-        SqlRowSet set = jdbcTemplate.queryForRowSet(userSql, film.getId());
-
-//        while (set.next()) {
-//            Set<Long> likes = new HashSet<>();
-//            if (film.getLikes() != null) {
-//                likes = film.getLikes();
-//            }
-//            likes.add(set.getLong("user_id"));
-//            film.setLikes(likes);
-//            film.setRate(likes.size());
-//        }
-        genres = genreStorage.getGenreFilms(id);
-        film.setGenres(genres);
         return film;
     }
 
@@ -82,7 +67,6 @@ public class FilmDbStorage implements FilmStorage {
         Map<String, Object> films = newMap(film);
         Long id = simpleJdbcInsert.executeAndReturnKey(films).longValue();
         film.setId(id);
-//        film.setRate(0);
         addGenreToFilm(film);
 
         genreStorage.addGenreToFilm(film.getId(), film.getGenres());
@@ -97,18 +81,6 @@ public class FilmDbStorage implements FilmStorage {
     public Film update(Film film) {
         validate(film);
         Film checkFilm = getFilmById(film.getId());
-//        String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
-//        SqlRowSet set = jdbcTemplate.queryForRowSet(userSql, film.getId());
-//        while (set.next()) {
-//            Set<Long> likes = new HashSet<>();
-//            if (film.getLikes() != null) {
-//                likes = film.getLikes();
-//            }
-//            likes.add(set.getLong("user_id"));
-//            film.setLikes(likes);
-//            film.setRate(likes.size());
-//        }
-
         String sqlQuery = "update films set " +
                 "name = ?, description = ?, release_date = ? , duration = ? , rate = ? , mpa_id = ? where film_id = ?";
         jdbcTemplate.update(
@@ -121,7 +93,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId()
         );
-
         genreStorage.deleteGenreFilmsByFilmId(film.getId());
         addGenreToFilm(film);
         genreStorage.addGenreToFilm(film.getId(), film.getGenres());
@@ -144,6 +115,7 @@ public class FilmDbStorage implements FilmStorage {
         values.put("description", film.getDescription());
         values.put("release_date", film.getReleaseDate());
         values.put("duration", film.getDuration());
+        values.put("rate", film.getRate());
         values.put("mpa_id", film.getMpa().getId());
         return values;
     }
@@ -168,53 +140,25 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-//    static Film queryRowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
-//        return Film.builder()
-//                .id(rs.getLong("film_id"))
-//                .name(rs.getString("name"))
-//                .description(rs.getString("description"))
-//                .releaseDate(rs.getDate("release_date").toLocalDate())
-//                .duration(rs.getInt("duration"))
-//                .build();
-//    }
-
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.NAME as mpa_name FROM FILMS f JOIN MPA m on f.mpa_id  = m.mpa_id";
-        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::rowNewMapperFilm);
-        List<Genre> genres = new ArrayList<>();
-        for (Film film : films) {
-            String userSql = "SELECT user_id FROM LIKES WHERE film_id =?";
-            SqlRowSet set = jdbcTemplate.queryForRowSet(userSql, film.getId());
-
-//            while (set.next()) {
-//                Set<Long> likes = new HashSet<>();
-//                if (film.getLikes() != null) {
-//                    likes = film.getLikes();
-//                }
-//                likes.add(set.getLong("user_id"));
-//                film.setLikes(likes);
-//                film.setRate(likes.size());
-//            }
-            genres = genreStorage.getGenreFilms(film.getId());
-            film.setGenres(genres);
-        }
-        return films;
+        return jdbcTemplate.query(sqlQuery, this::rowMapperFilm);
     }
 
-    static Film rowNewMapperFilm(ResultSet rs, int rowNum) throws SQLException {
-        Film film = new Film();
-        film.setId(rs.getLong("film_id"));
-        film.setName(rs.getString("name"));
-        film.setDescription(rs.getString("description"));
-        film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-        film.setDuration(rs.getInt("duration"));
-        film.setRate(rs.getInt("rate"));
-
-        Mpa mpa = new Mpa();
-        mpa.setId(rs.getInt("mpa_id"));
-        mpa.setName(rs.getString("mpa_name"));
-        film.setMpa(mpa);
-        return film;
+    private Film rowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(rs.getLong("film_id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .rate(rs.getInt("rate"))
+                .mpa(Mpa.builder()
+                        .id(rs.getLong("mpa_id"))
+                .name(rs.getString("mpa_name"))
+                .build())
+                .genres(genreStorage.getGenreFilms(rs.getLong("film_id")))
+                .build();
     }
 }

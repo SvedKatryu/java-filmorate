@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -50,22 +49,14 @@ public class FilmService {
         User user = userStorage.getUserById(userId);
         log.info("Поставлен лайк фильму: {}", filmStorage.getFilmById(film.getId()));
         likeStorage.addLike(film.getId(), user.getId());
-        int rate = film.getRate();
-        int newRate = rate + 1;
-        film.setRate(newRate);
-
-//        film.setRate(filmStorage.getFilmById(filmId).getRate() + 1);
+        film.setRate(film.getRate() + 1);
         filmStorage.update(film);
     }
 
     public void removeLike(long filmId, long userId) {
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
-        int rate = film.getRate();
-        int newRate = rate - 1;
-        film.setRate(newRate);
-
-//        film.setRate(filmStorage.getFilmById(filmId).getRate() - 1);
+        film.setRate(film.getRate() - 1);
         if (film.getLikes() != null && film.getLikes().contains(user.getId())) {
             log.info("Удалён лайк фильму: {}", film);
             likeStorage.deleteLike(film.getId(), user.getId());
