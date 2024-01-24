@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -30,14 +32,7 @@ public class Film {
     private int duration;
     private Set<Long> likes;
     private int rate;
-
-    public void addLike(long userId) {
-        likes.add(userId);
-        rate += 1;
-    }
-
-    public void removeLike(long userId) {
-        likes.remove(userId);
-        rate -= 1;
-    }
+    @NotNull
+    private Mpa mpa;
+    private List<Genre> genres = new ArrayList<>();
 }
