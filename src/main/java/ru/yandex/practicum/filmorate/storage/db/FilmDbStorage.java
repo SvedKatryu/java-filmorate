@@ -52,8 +52,11 @@ public class FilmDbStorage implements FilmStorage {
         if (films.isEmpty()) {
             throw new NotFoundException(String.format("film with id %s not found", id));
         }
+        genreStorage.getWithGenreFilms(films);
         Film film = films.get(0);
-
+        if (film.getGenres() == null) {
+            film.setGenres(new ArrayList<>());
+        }
         return film;
     }
 
@@ -142,7 +145,14 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.NAME as mpa_name FROM FILMS f JOIN MPA m on f.mpa_id  = m.mpa_id";
-        return jdbcTemplate.query(sqlQuery, this::rowMapperFilm);
+        List<Film> films = jdbcTemplate.query(sqlQuery, this::rowMapperFilm);
+        genreStorage.getWithGenreFilms(films);
+        for (Film film : films) {
+            if (film.getGenres() == null) {
+                film.setGenres(new ArrayList<>());
+            }
+        }
+        return films;
     }
 
     private Film rowMapperFilm(ResultSet rs, int rowNum) throws SQLException {
@@ -155,9 +165,8 @@ public class FilmDbStorage implements FilmStorage {
                 .rate(rs.getInt("rate"))
                 .mpa(Mpa.builder()
                         .id(rs.getLong("mpa_id"))
-                .name(rs.getString("mpa_name"))
-                .build())
-                .genres(genreStorage.getGenreFilms(rs.getLong("film_id")))
+                        .name(rs.getString("mpa_name"))
+                        .build())
                 .build();
     }
 }

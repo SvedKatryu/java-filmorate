@@ -5,13 +5,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 @RequiredArgsConstructor
@@ -52,12 +59,27 @@ public class GenreDbStorage implements GenreStorage {
         );
     }
 
-    public List<Genre> getGenreFilms(Long filmId) {
-        String sqlQuery = "select * from film_genres " +
-                "left join genres on genres.genre_id = film_genres.genre_id " +
-                "where film_id = ? " +
-                "order by genres.genre_id";
-        return jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
+    public void getWithGenreFilms(List<Film> films) {
+        String inSql = String.join(", ", Collections.nCopies(films.size(), "?"));
+        String sqlQuery = "select * from genres g, film_genres fg where fg.genre_id = g.genre_id and fg.film_id IN (" + inSql + ")";
+        Map<Long, Film> mapFilmsById = films.stream().collect(toMap(Film::getId, identity()));
+        jdbcTemplate.query(
+                sqlQuery,
+                (rs) -> {
+                    final long filmId = rs.getLong("film_id");
+                    Film film = mapFilmsById.get(filmId);
+                    if (film != null) {
+                        Genre genre = createGenre(rs, 0);
+                        List<Genre> genres = new ArrayList<>();
+                        if (film.getGenres() != null) {
+                            genres = film.getGenres();
+                        }
+                        genres.add(genre);
+                        film.setGenres(genres);
+                    }
+                },
+                mapFilmsById.keySet().toArray()
+        );
     }
 
     public void deleteGenreFilmsByFilmId(Long filmId) {
